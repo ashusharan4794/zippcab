@@ -1,0 +1,390 @@
+.page {
+  height: calc(100vh - var(--topbar-h));
+  overflow-y: auto;
+  background: var(--dark-1);
+}
+
+.inner {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Profile Card */
+.profileCard {
+  background: var(--dark-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  animation: fadeInUp 0.3s ease;
+}
+
+.profileLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.bigAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--yellow);
+  color: var(--dark-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 800;
+  font-family: var(--font-display);
+  flex-shrink: 0;
+}
+
+.profileName {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--text-1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editHint {
+  font-size: 13px;
+  color: var(--text-3);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.profileName:hover .editHint { opacity: 1; }
+
+.profilePhone {
+  font-size: 14px;
+  color: var(--text-2);
+  margin-top: 2px;
+}
+
+.profileSince {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 4px;
+}
+
+.editRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.nameInput {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(245,197,24,0.4);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-1);
+  font-family: var(--font-display);
+  width: 200px;
+}
+
+.saveBtn {
+  background: var(--yellow);
+  color: var(--dark-1);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Wallet */
+.walletBox {
+  background: rgba(245,197,24,0.07);
+  border: 1px solid rgba(245,197,24,0.2);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  text-align: right;
+  min-width: 160px;
+}
+
+.walletLabel {
+  font-size: 11px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 4px;
+}
+
+.walletAmt {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--yellow);
+  font-family: var(--font-display);
+  margin-bottom: 10px;
+  line-height: 1;
+}
+
+.topUpBtn {
+  background: var(--yellow);
+  color: var(--dark-1);
+  border: none;
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-body);
+}
+
+.topUpBtn:hover { background: var(--yellow-hover); }
+
+.topUpRow {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.topUpInput {
+  flex: 1;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 13px;
+  color: var(--text-1);
+  width: 80px;
+  font-family: var(--font-body);
+}
+
+.topUpConfirm {
+  background: var(--green);
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Stats */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.statCard {
+  background: var(--dark-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  animation: fadeInUp 0.35s ease both;
+}
+
+.statVal {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-1);
+  font-family: var(--font-display);
+  margin-bottom: 4px;
+}
+
+.statLbl {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/* Two-column grid */
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Panel */
+.panel {
+  background: var(--dark-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  animation: fadeInUp 0.4s ease both;
+}
+
+.panelTitle {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 14px;
+}
+
+/* Addresses */
+.addrList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.addrItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: rgba(255,255,255,0.03);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.addrIcon {
+  width: 24px;
+  height: 24px;
+  color: var(--text-2);
+  flex-shrink: 0;
+}
+
+.addrLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+  margin-bottom: 1px;
+}
+
+.addrText {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.addrEdit {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-3);
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+  flex-shrink: 0;
+}
+
+.addrEdit:hover { color: var(--yellow); }
+
+.addAddrBtn {
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px;
+  font-size: 13px;
+  color: var(--text-3);
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.addAddrBtn:hover {
+  border-color: rgba(245,197,24,0.3);
+  color: var(--yellow);
+}
+
+/* Offers */
+.offerList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.offerCard {
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--offer-color);
+}
+
+.offerCode {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--offer-color);
+  letter-spacing: 1px;
+  margin-bottom: 3px;
+}
+
+.offerTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-1);
+  margin-bottom: 1px;
+}
+
+.offerDesc {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+/* Settings */
+.settingsList {
+  display: flex;
+  flex-direction: column;
+}
+
+.settingItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+  border-radius: var(--radius-sm);
+}
+
+.settingItem:last-child { border-bottom: none; }
+
+.settingItem:hover {
+  background: rgba(255,255,255,0.03);
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.settingItem.highlight .settingLabel { color: var(--yellow); }
+
+.settingIcon {
+  width: 24px;
+  height: 24px;
+  color: var(--text-2);
+  flex-shrink: 0;
+}
+
+.settingText { flex: 1; }
+
+.settingLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-1);
+  margin-bottom: 1px;
+}
+
+.settingSub {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.chevron {
+  font-size: 20px;
+  color: var(--text-3);
+  flex-shrink: 0;
+}

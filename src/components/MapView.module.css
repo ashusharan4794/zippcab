@@ -1,0 +1,108 @@
+.mapWrap {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  background: #f3f4f6;
+}
+
+.map {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+}
+
+.infoCards {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 1000;
+}
+
+.infoCard {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  backdrop-filter: blur(8px);
+}
+
+.infoLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #555555;
+  font-weight: 500;
+}
+
+.infoValue {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000;
+  font-family: var(--font-display);
+}
+
+.liveBadge {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--green);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.liveDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
+  animation: livePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.8); }
+}
+
+/* Popup styling */
+:global(.leaflet-popup-content-wrapper) {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid rgba(0,0,0,0.1) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+}
+
+:global(.leaflet-popup-tip) {
+  background: #ffffff !important;
+}
+
+:global(.leaflet-popup-content) {
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 13px !important;
+  color: #555555 !important;
+}
+
+:global(.leaflet-popup-content strong) {
+  color: #000000 !important;
+  font-size: 14px !important;
+}
