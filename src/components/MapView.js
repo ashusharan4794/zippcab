@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { BENGALURU_CENTER, MAP_MARKERS } from '../data/mockData';
@@ -38,7 +38,7 @@ const currentLocationIcon = makeIcon('YOU', '#3B82F6');
 // Simulated driver position (midpoint that animates)
 const DRIVER_POS = [13.0674, 77.5952];
 
-function RecenterMap({ bookingStatus, currentLocation, pickupCoords, dropoffCoords }) {
+function RecenterMap({ bookingStatus, currentLocation, pickupCoords, dropoffCoords, routeCoords }) {
   const map = useMap();
 
   useEffect(() => {
@@ -51,7 +51,7 @@ function RecenterMap({ bookingStatus, currentLocation, pickupCoords, dropoffCoor
 
   useEffect(() => {
     if (pickupCoords && dropoffCoords) {
-      map.fitBounds([pickupCoords, dropoffCoords], { padding: [70, 70] });
+      map.fitBounds(routeCoords.length > 1 ? routeCoords : [pickupCoords, dropoffCoords], { padding: [70, 70] });
       return;
     }
 
@@ -63,22 +63,29 @@ function RecenterMap({ bookingStatus, currentLocation, pickupCoords, dropoffCoor
     if (bookingStatus === 'found' || bookingStatus === 'riding') {
       map.flyTo(MAP_MARKERS.pickup, 13, { duration: 1.5 });
     }
-  }, [bookingStatus, currentLocation, dropoffCoords, map, pickupCoords]);
+  }, [bookingStatus, currentLocation, dropoffCoords, map, pickupCoords, routeCoords]);
   return null;
 }
 
 export default function MapView({ bookingStatus, pickupCoords, dropoffCoords, distanceKm }) {
   const [currentLocation, setCurrentLocation] = useState(null);
-  const [locationStatus, setLocationStatus] = useState('Locating...');
+  const [routeState, setRouteState] = useState({
+    coords: [],
+    distanceKm: null,
+    isLoading: false,
+    error: '',
+  });
   const hasSelectedRoute = Boolean(pickupCoords && dropoffCoords && distanceKm);
-  const estimatedTimeMin = hasSelectedRoute ? Math.max(5, Math.round(distanceKm * 2.2)) : null;
-  const routeCoords = pickupCoords && dropoffCoords
-    ? [pickupCoords, dropoffCoords]
-    : [MAP_MARKERS.pickup, MAP_MARKERS.dropoff];
+  const fallbackRouteCoords = useMemo(
+    () => (pickupCoords && dropoffCoords ? [pickupCoords, dropoffCoords] : [MAP_MARKERS.pickup, MAP_MARKERS.dropoff]),
+    [dropoffCoords, pickupCoords]
+  );
+  const routeCoords = routeState.coords.length > 1 ? routeState.coords : fallbackRouteCoords;
+  const displayedDistanceKm = routeState.distanceKm || distanceKm;
+  const estimatedTimeMin = hasSelectedRoute && displayedDistanceKm ? Math.max(5, Math.round(displayedDistanceKm * 2.2)) : null;
 
   useEffect(() => {
     if (!navigator.geolocation) {
-      setLocationStatus('Location unavailable');
       return undefined;
     }
 
@@ -88,11 +95,8 @@ export default function MapView({ bookingStatus, pickupCoords, dropoffCoords, di
           coords: [coords.latitude, coords.longitude],
           accuracy: coords.accuracy,
         });
-        setLocationStatus('Current location');
       },
-      () => {
-        setLocationStatus('Location permission needed');
-      },
+      () => {},
       {
         enableHighAccuracy: true,
         maximumAge: 10000,
@@ -102,6 +106,57 @@ export default function MapView({ bookingStatus, pickupCoords, dropoffCoords, di
 
     return () => navigator.geolocation.clearWatch(watcherId);
   }, []);
+
+  useEffect(() => {
+    if (!pickupCoords || !dropoffCoords) {
+      setRouteState({ coords: [], distanceKm: null, isLoading: false, error: '' });
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    const [pickupLat, pickupLng] = pickupCoords;
+    const [dropoffLat, dropoffLng] = dropoffCoords;
+    const routeUrl = new URL(`https://router.project-osrm.org/route/v1/driving/${pickupLng},${pickupLat};${dropoffLng},${dropoffLat}`);
+    routeUrl.searchParams.set('overview', 'full');
+    routeUrl.searchParams.set('geometries', 'geojson');
+
+    setRouteState(current => ({ ...current, isLoading: true, error: '' }));
+
+    fetch(routeUrl, { signal: controller.signal })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Route request failed');
+        }
+        return response.json();
+      })
+      .then(data => {
+        const route = data.routes?.[0];
+        const coordinates = route?.geometry?.coordinates;
+
+        if (!Array.isArray(coordinates) || coordinates.length < 2) {
+          throw new Error('Route unavailable');
+        }
+
+        setRouteState({
+          coords: coordinates.map(([lng, lat]) => [lat, lng]),
+          distanceKm: Math.round((route.distance / 1000) * 10) / 10,
+          isLoading: false,
+          error: '',
+        });
+      })
+      .catch(error => {
+        if (error.name === 'AbortError') return;
+
+        setRouteState({
+          coords: [],
+          distanceKm: null,
+          isLoading: false,
+          error: 'Road route unavailable',
+        });
+      });
+
+    return () => controller.abort();
+  }, [dropoffCoords, pickupCoords]);
 
   return (
     <div className={styles.mapWrap}>
@@ -137,7 +192,7 @@ export default function MapView({ bookingStatus, pickupCoords, dropoffCoords, di
         {/* Route line */}
         <Polyline
           positions={routeCoords}
-          pathOptions={{ color: '#000000', weight: 4, opacity: 0.75, dashArray: '10 6' }}
+          pathOptions={{ color: '#000000', weight: 4, opacity: 0.75, dashArray: routeState.error ? '10 6' : undefined }}
         />
 
         {/* Pickup marker */}
@@ -178,19 +233,24 @@ export default function MapView({ bookingStatus, pickupCoords, dropoffCoords, di
           currentLocation={currentLocation}
           pickupCoords={pickupCoords}
           dropoffCoords={dropoffCoords}
+          routeCoords={routeCoords}
         />
       </MapContainer>
 
       {/* Map Overlay Info */}
       <div className={styles.infoCards}>
         <div className={styles.infoCard}>
-          <span className={styles.infoLabel}>Location</span>
-          <span className={styles.infoValue}>{locationStatus}</span>
-        </div>
-        <div className={styles.infoCard}>
           <span className={styles.infoLabel}>Distance</span>
-          <span className={styles.infoValue}>{distanceKm ? `${distanceKm} km` : 'Select route'}</span>
+          <span className={styles.infoValue}>
+            {routeState.isLoading ? 'Routing...' : displayedDistanceKm ? `${displayedDistanceKm} km` : 'Select route'}
+          </span>
         </div>
+        {routeState.error && (
+          <div className={styles.infoCard}>
+            <span className={styles.infoLabel}>Route</span>
+            <span className={styles.infoValue}>{routeState.error}</span>
+          </div>
+        )}
         {estimatedTimeMin && (
           <div className={styles.infoCard}>
             <span className={styles.infoLabel}>Est. Time</span>

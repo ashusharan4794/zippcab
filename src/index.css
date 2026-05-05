@@ -58,6 +58,20 @@ html, body {
   height: 100%;
 }
 
+.appShell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.appMain {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 button {
   font-family: var(--font-body);
   cursor: pointer;
@@ -144,3 +158,13 @@ a {
 
 .animate-fade-in-up { animation: fadeInUp 0.4s ease both; }
 .animate-fade-in    { animation: fadeIn 0.3s ease both; }
+
+@media (max-width: 768px) {
+  :root {
+    --topbar-h: 104px;
+  }
+
+  html, body, #root {
+    min-width: 320px;
+  }
+}

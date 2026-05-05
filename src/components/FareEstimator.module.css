@@ -124,3 +124,13 @@
   color: var(--red);
   padding-left: 2px;
 }
+
+@media (max-width: 420px) {
+  .promoRow {
+    flex-direction: column;
+  }
+
+  .applyBtn {
+    min-height: 42px;
+  }
+}

@@ -5,7 +5,6 @@ import styles from './Topbar.module.css';
 const NAV_ITEMS = [
   { id: 'book',    label: 'Book Ride' },
   { id: 'rides',   label: 'My Rides'  },
-  { id: 'account', label: 'Account'   },
 ];
 
 export default function Topbar() {
@@ -27,13 +26,17 @@ export default function Topbar() {
         ))}
       </nav>
 
-      <div className={styles.userChip}>
+      <button
+        className={`${styles.userChip} ${state.activeNav === 'account' ? styles.userChipActive : ''}`}
+        onClick={() => dispatch({ type: 'SET_NAV', payload: 'account' })}
+        title="My account"
+      >
         <div className={styles.avatar}>{state.user.initials}</div>
         <div className={styles.userInfo}>
           <span className={styles.userName}>{state.user.name.split(' ')[0]}</span>
           <span className={styles.walletBadge}>₹{state.user.walletBalance}</span>
         </div>
-      </div>
+      </button>
     </header>
   );
 }

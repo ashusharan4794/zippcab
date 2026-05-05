@@ -20,34 +20,9 @@ export default function RidesPage() {
     return r.status === filter.toLowerCase();
   });
 
-  const totalSpent    = state.rideHistory.filter(r => r.status === 'completed').reduce((s, r) => s + r.amount, 0);
-  const completedCount = state.rideHistory.filter(r => r.status === 'completed').length;
-  const totalRides = Math.max(state.user.totalRides, state.rideHistory.length);
-
   return (
     <div className={styles.page}>
       <div className={styles.inner}>
-
-        {/* Header stats */}
-        <div className={styles.statsRow}>
-          <div className={styles.statCard}>
-            <span className={styles.statVal}>{totalRides}</span>
-            <span className={styles.statLbl}>Total Rides</span>
-          </div>
-          <div className={styles.statCard}>
-            <span className={`${styles.statVal} ${styles.yellow}`}>₹{totalSpent.toLocaleString('en-IN')}</span>
-            <span className={styles.statLbl}>Total Spent</span>
-          </div>
-          <div className={styles.statCard}>
-            <span className={styles.statVal}>{completedCount}</span>
-            <span className={styles.statLbl}>Completed</span>
-          </div>
-          <div className={styles.statCard}>
-            <span className={styles.statVal}>{state.rideHistory.length - completedCount}</span>
-            <span className={styles.statLbl}>Cancelled</span>
-          </div>
-        </div>
-
         {/* Filter tabs */}
         <div className={styles.filters}>
           {FILTERS.map(f => (
@@ -65,7 +40,7 @@ export default function RidesPage() {
         <div className={styles.list}>
           {rides.length === 0 && (
             <div className={styles.empty}>
-              <Icon name="sedan" className={styles.emptyIcon} title="No rides" />
+              <Icon name="empty" className={styles.emptyIcon} title="No rides" />
               <p>No rides found</p>
             </div>
           )}

@@ -70,3 +70,13 @@
 .message {
   flex: 1;
 }
+
+@media (max-width: 768px) {
+  .toast {
+    top: calc(var(--topbar-h) + 10px);
+    left: 12px;
+    right: 12px;
+    max-width: none;
+    padding: 11px 14px;
+  }
+}

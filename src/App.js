@@ -5,10 +5,15 @@ import Notification from './components/Notification';
 import BookPage from './pages/BookPage';
 import RidesPage from './pages/RidesPage';
 import AccountPage from './pages/AccountPage';
+import AuthPage from './pages/AuthPage';
 import './index.css';
 
 function AppShell() {
   const { state } = useApp();
+
+  if (!state.isLoggedIn) {
+    return <AuthPage />;
+  }
 
   const pages = {
     book:    <BookPage />,
@@ -17,9 +22,9 @@ function AppShell() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+    <div className="appShell">
       <Topbar />
-      <main style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+      <main className="appMain">
         {pages[state.activeNav] || <BookPage />}
       </main>
       <Notification />

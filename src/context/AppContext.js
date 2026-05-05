@@ -2,9 +2,48 @@ import React, { createContext, useContext, useReducer } from 'react';
 import { MOCK_RIDE_HISTORY, SAVED_ADDRESSES } from '../data/mockData';
 
 const AppContext = createContext();
+const USERS_STORAGE_KEY = 'zippcab_users';
+
+function getStoredUsers() {
+  try {
+    return JSON.parse(window.localStorage.getItem(USERS_STORAGE_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+
+function saveStoredUsers(users) {
+  try {
+    window.localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+  } catch {
+    // Local storage may be unavailable in restricted browser modes.
+  }
+}
 
 function normalizeAddress(value) {
   return value.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function getInitials(name) {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map(part => part[0]?.toUpperCase())
+    .join('') || 'U';
+}
+
+function createFreshUser({ name, contact, email }) {
+  return {
+    name: name.trim(),
+    phone: contact.trim(),
+    email: email.trim().toLowerCase(),
+    initials: getInitials(name),
+    walletBalance: 0,
+    memberSince: new Date().toLocaleString('en-IN', { month: 'long', year: 'numeric' }),
+    totalRides: 0,
+    totalSpent: 0,
+  };
 }
 
 function getAddressPayload(payload) {
@@ -21,6 +60,10 @@ function getAddressPayload(payload) {
 }
 
 const initialState = {
+  // Auth
+  isAuthenticated: false,
+  isLoggedIn: false,
+
   // Booking
   pickup:       '',
   dropoff:      '',
@@ -43,11 +86,12 @@ const initialState = {
 
   // User
   user: {
-    name: 'Ashu Sharan',
-    phone: '+91 72958 67927',
+    name: '',
+    phone: '',
+    email: '',
     initials: 'AS',
     walletBalance: 0,
-    memberSince: 'March 2026',
+    memberSince: '',
     totalRides: 0,
     totalSpent: 0,
   },
@@ -59,6 +103,54 @@ const initialState = {
 
 function reducer(state, action) {
   switch (action.type) {
+    case 'LOGIN': {
+      const users = getStoredUsers();
+      const email = action.payload.email.trim().toLowerCase();
+      const found = users.find(user => user.email === email && user.password === action.payload.password);
+
+      if (!found) {
+        return { ...state, notification: { message: 'Invalid email or password', type: 'error' } };
+      }
+
+      return {
+        ...state,
+        isAuthenticated: true,
+        isLoggedIn: true,
+        user: found.profile,
+        activeNav: 'book',
+        notification: { message: `Welcome back, ${found.profile.name.split(' ')[0]}!`, type: 'success' },
+      };
+    }
+    case 'SIGN_UP': {
+      const users = getStoredUsers();
+      const email = action.payload.email.trim().toLowerCase();
+      const exists = users.some(user => user.email === email);
+
+      if (exists) {
+        return { ...state, notification: { message: 'An account already exists with this email', type: 'error' } };
+      }
+
+      const profile = createFreshUser(action.payload);
+      saveStoredUsers([...users, { email, password: action.payload.password, profile }]);
+
+      return {
+        ...state,
+        isAuthenticated: true,
+        isLoggedIn: true,
+        user: profile,
+        activeNav: 'book',
+        notification: { message: 'Signup complete. Welcome to ZippCab!', type: 'success' },
+      };
+    }
+    case 'LOGIN_USER':
+      return {
+        ...state,
+        user: { ...state.user, ...action.payload },
+        isLoggedIn: true,
+        isAuthenticated: true,
+      };
+    case 'LOGOUT':
+      return { ...state, isLoggedIn: false, isAuthenticated: false };
     case 'SET_PICKUP': {
       const pickup = getAddressPayload(action.payload);
       return { ...state, pickup: pickup.address, pickupCoords: pickup.coords };
